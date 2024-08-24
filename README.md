@@ -26,7 +26,7 @@ Description TBA
 4. Activate environment:
 
    ```
-   .\venv\Scripts\activate
+   ./venv/Scripts/activate
    ```
 
 5. Install the required modules:
@@ -73,5 +73,5 @@ Description TBA
 
 6. Fetch teachers data by visiting page:
    ```
-   http://localhost:5000/fetch_staff`
+   http://localhost:5000/fetch_staff
    ```
