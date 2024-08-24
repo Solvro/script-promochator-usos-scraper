@@ -3,7 +3,7 @@ Description TBA
 
 ## Development
 ### Quick start
-If you want to setup project locally
+#### Setup project locally
 
 1. Clone the repository:
 
@@ -43,7 +43,7 @@ If you want to setup project locally
 
    ```
    cd usos-teachers-scraper
-   `
+   ```
 
 3. Create a `config.json` file. Then come up with a secret key. Finally, paste your Consumer Key and Consumer Secret:
 
@@ -53,14 +53,21 @@ If you want to setup project locally
     "consumer_key": "<generated-consumer-key>",
     "consumer_secret": "<generated-consumer-secret>"
    }
-   `
+   ```
 
 4. Run the script:
 
    ```
    python ./usos-teachers-scraper.py
-   `
+   ```
 
-5. Visit the USOS authorization page `http://localhost:5000/start_oauth`
+5. Visit the USOS authorization page:
+   
+   ```
+   http://localhost:5000/start_oauth
+   ```
 
-6. Fetch teacher data by visiting page `http://localhost:5000/fetch_staff`
+6. Fetch teacher data by visiting page:
+   ```
+   http://localhost:5000/fetch_staff`
+   ```
