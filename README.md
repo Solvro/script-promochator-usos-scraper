@@ -35,9 +35,13 @@ Description TBA
    python -m pip install -r requirements.txt
    ```
 
-#### usos-teachers-scraper
+#### Run usos-teachers-scraper
 
-1. Sign up for an API key `https://apps.usos.pwr.edu.pl/developers/`
+1. Sign up for an API key:
+
+   ```
+   https://apps.usos.pwr.edu.pl/developers/`
+   ```
 
 2. Change directory:
 
@@ -67,7 +71,7 @@ Description TBA
    http://localhost:5000/start_oauth
    ```
 
-6. Fetch teacher data by visiting page:
+6. Fetch teachers data by visiting page:
    ```
    http://localhost:5000/fetch_staff`
    ```
