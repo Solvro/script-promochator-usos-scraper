@@ -1,9 +1,10 @@
 from fp.fp import FreeProxy
 from lxml import html
-import requests
-import json
 from random import randint
 from time import sleep
+import requests
+import json
+import os
 
 proxy = FreeProxy(rand=True, anonym=True).get()
 
@@ -14,7 +15,14 @@ proxies = {
 
 print(proxies)
 
-with open("usos-abstracts-scraper/thesis_data.json", "a") as file:
+current_directory = os.getcwd()
+
+if 'usos-abstracts-scraper' in os.path.basename(current_directory):
+    file_path = os.path.join(current_directory, 'thesis_data.json')
+else:
+    file_path = os.path.join(current_directory, 'usos-abstracts-scraper', 'thesis_data.json')
+
+with open(file_path, "a") as file:
     #file.write("[") 
     for thesis_id in range(1, 100): # max 16940 
         url = f"https://apd.usos.pwr.edu.pl/diplomas/{thesis_id}"
