@@ -68,10 +68,10 @@ Description TBA
 5. Visit the USOS authorization page:
    
    ```
-   http://localhost:5000/start_oauth
+   http://127.0.0.1:5000/start_oauth
    ```
 
 6. Fetch teachers data by visiting page:
    ```
-   http://localhost:5000/fetch_staff
+   http://127.0.0.1:5000/fetch_staff
    ```
