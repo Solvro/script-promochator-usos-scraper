@@ -40,7 +40,7 @@ Description TBA
 1. Sign up for an API key:
 
    ```
-   https://apps.usos.pwr.edu.pl/developers/`
+   https://apps.usos.pwr.edu.pl/developers/
    ```
 
 2. Change directory:
