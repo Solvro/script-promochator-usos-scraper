@@ -1,3 +1,8 @@
 #usos-teachers-scraper
 flask
 rauth
+
+#usos-abstracts-scraper
+lxml
+requests
+free-proxy

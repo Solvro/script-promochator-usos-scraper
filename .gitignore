@@ -164,3 +164,4 @@ cython_debug/
 venv
 config.json
 teachers_data
+thesis_data.json
