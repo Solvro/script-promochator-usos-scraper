@@ -75,3 +75,22 @@ Description TBA
    ```
    http://127.0.0.1:5000/fetch_staff
    ```
+
+#### Run usos-abstracts-scraper
+
+1. Change directory:
+
+   ```
+   cd usos-abstracts-scraper
+   ```
+
+2. Optionally, run a text editor, such as vim, and uncomment a few code snippets to enable the HTTP proxy. Remember that it is not recommended due to the security of public proxy data processing.
+
+3. Run the script:
+
+   ```
+   python ./usos-abstracts-scraper.py
+   ```
+
+4. Input initial thesis id and final thesis id.
+ 
