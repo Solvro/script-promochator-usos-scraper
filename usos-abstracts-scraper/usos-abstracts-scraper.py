@@ -1,11 +1,15 @@
-import aiohttp
 import asyncio
-from lxml import html
-from fake_useragent import UserAgent
+import aiohttp
+import aiofiles
+import sys
 import json
 import os
+from lxml import html
+from fake_useragent import UserAgent
 from tenacity import retry, stop_after_attempt, wait_exponential
-import aiofiles
+
+if sys.platform == "win32":
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 
 async def fetch(session, url, headers):
@@ -28,11 +32,16 @@ async def fetch_thesis_data(session, thesis_id, ua):
 
     tree = html.fromstring(content)
 
+    thesis_type = " ".join(
+        tree.xpath('//*[@id="pageBody"]/div/h1/span[2]/text()')
+    ).strip()
+
+    if thesis_type == "404":
+        return None
+
     thesis_data = {
         "thesis_id": thesis_id,
-        "thesis_type": " ".join(
-            tree.xpath('//*[@id="pageBody"]/div/h1/span[2]/text()')
-        ).strip(),
+        "thesis_type": thesis_type,
         "thesis_language": " ".join(
             tree.xpath('//*[@id="thesisInfo"]/tbody/tr[1]/td[2]/text()')
         ).strip(),
@@ -120,19 +129,25 @@ async def fetch_thesis_data(session, thesis_id, ua):
         )
 
     if pdf_pl_abstract and pdf_en_abstract:
-        await pdf_generator(session, pdf_pl_abstract, "pl", thesis_data, thesis_id)
-        await pdf_generator(session, pdf_en_abstract, "en", thesis_data, thesis_id)
+        await pdf_generator(
+            session, pdf_pl_abstract, "pl", thesis_data, thesis_id, fake_ua
+        )
+        await pdf_generator(
+            session, pdf_en_abstract, "en", thesis_data, thesis_id, fake_ua
+        )
 
     return thesis_data
 
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=10))
-async def pdf_generator(session, pdf_abstract, language, thesis_data, thesis_id):
+async def pdf_generator(
+    session, pdf_abstract, language, thesis_data, thesis_id, fake_ua
+):
     apd_url = "https://apd.usos.pwr.edu.pl"
     thesis_data[f"{language}_abstract"] = apd_url + pdf_abstract
     full_url = thesis_data[f"{language}_abstract"]
 
-    headers = {"User-Agent": UserAgent().random, "Accept": "application/json"}
+    headers = {"User-Agent": fake_ua, "Accept": "application/json"}
     async with session.get(full_url, headers=headers) as response:
         content = await response.read()
 
@@ -145,8 +160,7 @@ async def pdf_generator(session, pdf_abstract, language, thesis_data, thesis_id)
         await pdf_file.write(content)
 
 
-async def process_theses(first_thesis_id, last_thesis_id):
-    ua = UserAgent()
+async def process_theses(first_thesis_id, last_thesis_id, ua):
     theses_list = []
     semaphore = asyncio.Semaphore(40)  # Limit to 40 concurrent requests
 
@@ -173,12 +187,16 @@ async def process_theses(first_thesis_id, last_thesis_id):
 
 
 async def main():
+    ua = UserAgent()
+
     first_thesis_id = int(input("Input initial thesis id - minimum 1: "))
     last_thesis_id = (
         int(input("Input final thesis id - maximum 16946 as of 26/08/2024: ")) + 1
     )
 
-    theses_list = await process_theses(first_thesis_id, last_thesis_id)
+    theses_list = await process_theses(first_thesis_id, last_thesis_id, ua)
+
+    sorted_theses_list = sorted(theses_list, key=lambda x: x['thesis_id'])
 
     current_directory = os.getcwd()
     if "usos-abstracts-scraper" in os.path.basename(current_directory):
@@ -189,7 +207,7 @@ async def main():
         )
 
     async with aiofiles.open(file_path, "w") as file:
-        await file.write(json.dumps(theses_list, indent=4, separators=(",", ": ")))
+        await file.write(json.dumps(sorted_theses_list, indent=4, separators=(",", ": ")))
 
 
 if __name__ == "__main__":
