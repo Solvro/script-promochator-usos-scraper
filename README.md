@@ -111,15 +111,13 @@ Project uses following languages and technologies
    cd usos-abstracts-scraper
    ```
 
-2. Optionally, run a text editor, such as vim, and uncomment a few code snippets to enable the HTTP proxy. Remember that it is not recommended due to the security of public proxy data processing.
-
-3. Run the script:
+2. Run the script:
 
    ```
    python ./usos-abstracts-scraper.py
    ```
 
-4. Input initial thesis id and final thesis id.
+3. Input initial thesis id and final thesis id.
 
 ### Github workflow
 
