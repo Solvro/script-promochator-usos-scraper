@@ -144,7 +144,7 @@ async def fetch_thesis_data(session, thesis_id, ua):
 async def pdf_generator(
     session, pdf_abstract, language, thesis_data, thesis_id, fake_ua
 ):
-    apd_url = "https://apd.usos.pwr.edu.pl"
+    apd_url = "https://apd.usos.pw.edu.pl"
     thesis_data[f"{language}_abstract"] = apd_url + pdf_abstract
     full_url = thesis_data[f"{language}_abstract"]
 
