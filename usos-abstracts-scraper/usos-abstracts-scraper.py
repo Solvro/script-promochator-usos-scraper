@@ -4,6 +4,7 @@ import aiofiles
 import sys
 import json
 import os
+import random
 from lxml import html
 from fake_useragent import UserAgent
 from tenacity import retry, stop_after_attempt, wait_exponential
@@ -19,7 +20,7 @@ async def fetch(session, url, headers):
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=10))
 async def fetch_thesis_data(session, thesis_id, ua):
-    url = f"https://apd.usos.pwr.edu.pl/diplomas/{thesis_id}"
+    url = f"https://apd.usos.pw.edu.pl/diplomas/{thesis_id}"
     fake_ua = ua.random
     headers = {"User-Agent": fake_ua, "Accept": "application/json"}
 
@@ -160,7 +161,7 @@ async def pdf_generator(
         await pdf_file.write(content)
 
 
-async def process_theses(first_thesis_id, last_thesis_id, ua):
+async def process_theses(first_thesis_id, last_thesis_id, thesis_ids, ua, choose):
     theses_list = []
     semaphore = asyncio.Semaphore(40)  # Limit to 40 concurrent requests
 
@@ -170,9 +171,15 @@ async def process_theses(first_thesis_id, last_thesis_id, ua):
 
     async with aiohttp.ClientSession() as session:
         tasks = []
-        for thesis_id in range(first_thesis_id, last_thesis_id):
-            task = asyncio.ensure_future(fetch_with_semaphore(session, thesis_id))
-            tasks.append(task)
+
+        if choose == 1:
+            for thesis_id in range(first_thesis_id, last_thesis_id):
+                task = asyncio.ensure_future(fetch_with_semaphore(session, thesis_id))
+                tasks.append(task)
+        elif choose == 2:
+            for thesis_id in thesis_ids:
+                task = asyncio.ensure_future(fetch_with_semaphore(session, thesis_id))
+                tasks.append(task)
 
         for task in asyncio.as_completed(tasks):
             try:
@@ -187,14 +194,27 @@ async def process_theses(first_thesis_id, last_thesis_id, ua):
 
 
 async def main():
+    first_thesis_id=-1
+    last_thesis_id=-1
+    thesis_ids=-1
+
     ua = UserAgent()
 
-    first_thesis_id = int(input("Input initial thesis id - minimum 1: "))
-    last_thesis_id = (
-        int(input("Input final thesis id - maximum 16946 as of 26/08/2024: ")) + 1
-    )
+    choose = int(input("Enter '1' to input id range, enter '2' to draw ids: "))
 
-    theses_list = await process_theses(first_thesis_id, last_thesis_id, ua)
+    if choose == 1:
+        first_thesis_id = int(input("Input initial thesis id - minimum 1: "))
+        last_thesis_id = (
+            int(input("Input final thesis id - maximum 16946 as of 26/08/2024: ")) + 1
+        )
+
+        theses_list = await process_theses(first_thesis_id=first_thesis_id, last_thesis_id=last_thesis_id, thesis_ids=None, ua=ua, choose=choose)
+    elif choose == 2:
+        ids_number = int(input("Enter ids number: "))
+
+        thesis_ids = random.sample(range(1, 30001), ids_number)
+    
+        theses_list = await process_theses(first_thesis_id=None, last_thesis_id=None, thesis_ids=thesis_ids, ua=ua, choose=choose)
 
     sorted_theses_list = sorted(theses_list, key=lambda x: x['thesis_id'])
 
